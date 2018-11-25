@@ -1,15 +1,15 @@
 <template>
   <div class="page">
-      <Todo></Todo>
+    <TodoContainer></TodoContainer>
   </div>
 </template>
 
 <script>
-import Todo from './Todo'
+import TodoContainer from './TodoContainer'
 export default {
   name: 'home',
   components: {
-    'Todo': Todo
+    'TodoContainer': TodoContainer
   },
   data () {
     return {

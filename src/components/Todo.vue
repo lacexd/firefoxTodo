@@ -1,15 +1,16 @@
 <template>
 	<div class="todo-card">
 		<div class="group-title-container">
-			<span class="group-title">Work todos</span>
+			<input class="group-title" v-model="todo.name"></input>
+			<!-- <span class="group-title">{{ name }}</span> -->
 			<i class="fa fa-ellipsis-v menu" aria-hidden="true"></i>
 		</div>
-		<div class="todo-container" v-for="todo in todos">
+		<div class="todo-container" v-for="task in todo.todos">
 			<div class="todo">
-        <input class="todo-title" v-model="todo.title" v-on:keyup.13="add(todo.title)"></input>
+        <input class="todo-title" v-model="task.title" v-on:keyup.13="add(todo)"></input>
         <div class="control-container">
-          <div class="control-circle" id="submit" v-on:click="editTodo(todo)"></div>
-          <div class="control-circle" id="delete" v-on:click="removeTodo(todo.title)"></div>
+          <!-- <div class="control-circle" id="submit" v-on:click="editTodo(task)"></div> -->
+          <div class="control-circle" id="delete" v-on:click="removeTodo(task, todo)"></div>
         </div>
       </div>
     </div>
@@ -20,22 +21,18 @@
 import { mapState } from 'vuex'
 export default {
   name: 'todo',
-  computed: mapState([
-	   'todos'
-	]),
-  data () {
-    return {
-
-    }
-  },
+	props: ['todo', 'name'],
+  data () {return {}},
   methods: {
     add: function(title){
-      this.$store.dispatch('ADD_TODO', title)
+      this.$store.dispatch('ADD_TASK', title)
     },
 
-    removeTodo: function(title){
-      if(this.todos.length !== 1)
-      this.$store.dispatch('DELETE_TODO', title)
+    removeTodo: function(task, todo){
+      this.$store.dispatch('DELETE_TASK', {
+				task,
+				todo
+			})
     }
   }
 }
@@ -47,8 +44,7 @@ export default {
 	background-color: #F2F1EF;
 	margin: 10px 10px 10px 10px;
 	border-radius: 5px;
-	min-height: 50%;
-/* 	max-height: 70%; */
+	max-height: 60%;
 	min-width: 20%;
 	max-width: 30%;
 	display: flex;
@@ -81,6 +77,8 @@ export default {
 	margin-left: 15px;
 	font-size: 0.9rem;
 	font-weight: bold;
+	background-color: #1BA39C;
+	border: none;
 	color: black;
 }
 
@@ -116,7 +114,7 @@ export default {
 	align-items: center;
   flex-direction: column;
   width: 100%;
-	height: 100%;
+
 	position:relative;
 }
 

@@ -1,24 +1,44 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VuexPersist from 'vuex-persist'
+import uniqid from 'uniqid'
 
 Vue.use(Vuex)
+
 const STORAGE_KEY = 'vue-js-todo-P7oZi9sL'
+const initObject = [{
+    name: 'Work todos',
+    id: uniqid(),
+    todos: [{
+      title: '',
+      id: uniqid()
+    }]
+  }, {
+    name: 'Household chores',
+    id: uniqid(),
+    todos: [{
+      title: '',
+      id: uniqid()
+    }]
+}]
 const store = new Vuex.Store({
   state: {
-    todos: JSON.parse(localStorage.getItem(STORAGE_KEY) || '[{title: ""}]')
+    todos: localStorage.getItem(STORAGE_KEY) ? JSON.parse(localStorage.getItem(STORAGE_KEY)) : JSON.parse(JSON.stringify(initObject))
   },
   actions: {
     LOAD_TODO_LIST: ({ commit }) => {
-        commit('SET_TODO_LIST', JSON.parse(localStorage.getItem(STORAGE_KEY) || '[{"title": ""}]'))
+        commit('SET_TODO_LIST', localStorage.getItem(STORAGE_KEY) ? JSON.parse(localStorage.getItem(STORAGE_KEY)) : JSON.parse(JSON.stringify(initObject)))
     },
 
-    ADD_TODO: ({commit}, todo) => {
-      commit('ADD_TODO', todo)
+    ADD_TASK: ({commit}, todo) => {
+      commit('ADD_TASK', todo)
     },
 
-    DELETE_TODO: ({commit}, todo) => {
-      commit('DELETE_TODO', todo)
-    }
+    DELETE_TASK: ({commit}, taskAndTodo) => {
+      commit('DELETE_TODO', taskAndTodo)
+    },
+
+
   },
   mutations: {
     SET_TODO_LIST: (state, list) => {
@@ -26,20 +46,31 @@ const store = new Vuex.Store({
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.todos))
     },
 
-    ADD_TODO: (state, todo) => {
-      state.todos[state.todos.length - 1] = {
-        title: todo
+    ADD_TASK: (state, todo) => {
+      const foundTodo = state.todos.find((el) => {
+        return todo.id === el.id;
+      });
+      if(foundTodo){
+        foundTodo.todos.push({
+          title: '',
+          id: uniqid()
+        })
       }
-      state.todos.push({
-        title: ''
-      })
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.todos))
     },
 
-    DELETE_TODO: (state, todo) => {
-      state.todos = state.todos.filter(function(v){
-        return v.title !== todo
+    DELETE_TASK: (state, taskAndTodo) => {
+      const foundTodo = state.todos.find((el) => {
+        return taskAndTodo.todo.id === el.id;
+      });
+      foundTodo.todos = foundTodo.todos.filter(function(v){
+        return v.id !== taskAndTodo.task.id
       })
+
+      if(foundTodo.todos.length === 0) {
+        foundTodo.todos.push(initObject)
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.todos))
     }
   },
